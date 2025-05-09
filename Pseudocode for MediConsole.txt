@@ -1,0 +1,87 @@
+START
+
+SET FILENAME = "patients.txt"
+INITIALIZE patient_records as empty dictionary
+
+FUNCTION load_records():
+    IF file named FILENAME does NOT exist:
+        RETURN
+    OPEN FILENAME for reading
+    FOR each line in the file:
+        STRIP whitespace from line
+        IF line is not empty:
+            SPLIT line by " | " into pid, name, age, diagnosis, room, date
+            STORE these values in patient_records using pid as key
+
+FUNCTION save_records():
+    OPEN FILENAME for writing
+    FOR each pid, info in patient_records:
+        FORMAT info as string separated by " | "
+        WRITE formatted string to file
+
+FUNCTION add_patient():
+    PROMPT user for patient_id
+    IF patient_id already exists in patient_records:
+        PRINT "ID already exists" and RETURN
+    PROMPT for name, age, diagnosis, room, date_admitted
+    VALIDATE date_admitted using format YYYY-MM-DD
+    IF invalid:
+        PRINT error and RETURN
+    STORE all data in patient_records using patient_id
+    CALL save_records()
+    PRINT success message
+
+FUNCTION search_patient():
+    PROMPT user for search_id
+    IF search_id exists in patient_records:
+        DISPLAY patient information
+    ELSE:
+        PRINT "Record not found"
+
+FUNCTION delete_patient():
+    PROMPT user for del_id
+    IF del_id exists in patient_records:
+        ASK for confirmation
+        IF confirmed:
+            DELETE record from patient_records
+            CALL save_records()
+            PRINT success message
+        ELSE:
+            PRINT cancellation message
+    ELSE:
+        PRINT "Record not found"
+
+FUNCTION view_all_patients():
+    IF patient_records is empty:
+        PRINT "No records"
+        RETURN
+    FOR each pid, info in patient_records:
+        PRINT patient_id and corresponding info
+
+FUNCTION show_menu():
+    DISPLAY menu options:
+        1. Add New Patient
+        2. Search Patient by ID
+        3. Delete Patient
+        4. View All Patients
+        5. Exit
+
+CALL load_records() on startup
+
+WHILE True:
+    CALL show_menu()
+    PROMPT for user choice
+    IF choice is 1:
+        CALL add_patient()
+    ELSE IF choice is 2:
+        CALL search_patient()
+    ELSE IF choice is 3:
+        CALL delete_patient()
+    ELSE IF choice is 4:
+        CALL view_all_patients()
+    ELSE IF choice is 5:
+        PRINT "Goodbye" and BREAK
+    ELSE:
+        PRINT "Invalid choice"
+
+END
